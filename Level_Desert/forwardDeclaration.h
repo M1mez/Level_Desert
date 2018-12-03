@@ -2,8 +2,10 @@
 #include "GameObject.h"
 
 // creation
-extern GameObject* createSimpleTriangleFixedMidScreen(void);
-extern GameObject* createSimpleRectangleFixedMidScreen(void);
-extern GameObject* createPlane(void);
+GameObject* createSimpleTriangleFixedMidScreen(void);
+GameObject* createSimpleRectangleFixedMidScreen(void);
+GameObject* createPlaneSquare(void);
+GameObject *createPlaneDisk(void);
 GameObject *createCubeInSpace(void);
+GameObject *createSkyBox(void);
 Shader *getShader(vertexShaderType v, fragmentShaderType f);

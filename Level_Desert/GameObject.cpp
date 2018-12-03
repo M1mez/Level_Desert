@@ -3,16 +3,29 @@
 #include <iostream>
 #include "stb_image.h"
 
-GameObject::GameObject(arrayObj<float> verticesObj, arrayObj<unsigned int> indicesObj, glm::vec3 position, Shader *shader) :
-	m_vertices(verticesObj), m_indices(indicesObj), m_position(position), m_shader(shader)
+GameObject::GameObject(Shader *shader, arrayObj<float> verticesObj, arrayObj<unsigned int> indicesObj) 
+	: m_shader(shader)
 {
+	setVertices(verticesObj);
+	setIndices(indicesObj);
+	m_indicesSet = false;
+
 	glGenVertexArrays(1, &m_VAO);
 	glGenBuffers(1, &m_VBO);
-	if (m_indices.size != 0)
-		glGenBuffers(1, &m_EBO);
-
+	glGenBuffers(1, &m_EBO);
 
 	initializeGlOBjects();
+}
+
+GameObject::GameObject(Shader* shader, arrayObj<float> verticesObj)
+	: m_shader(shader)
+{
+	setVertices(verticesObj);
+}
+
+GameObject::GameObject(Shader* shader)
+	: m_shader(shader)
+{
 }
 
 int GameObject::initializeGlOBjects()
@@ -81,7 +94,28 @@ void GameObject::setMat4(const std::string &name, const glm::mat4 &mat) const
 	m_shader->setMat4(name, mat);
 }
 
+void GameObject::setVertices(arrayObj<float> v)
+{
+	m_vertices = v;
+}
 
+void GameObject::setIndices(arrayObj<unsigned int> i)
+{
+	m_indices = i;
+	m_indicesSet = true;
+}
+
+void GameObject::setColorPerV(arrayObj<float> c)
+{
+
+}
+
+void GameObject::setTexturePerV(arrayObj<float> t)
+{
+
+}
+
+/*
 void GameObject::changePos(const char* shaderVariable, float x, float y, float z, float w) const
 {
 	int variableLocation = glGetUniformLocation(m_shader->ID, shaderVariable);
@@ -94,7 +128,7 @@ void GameObject::changeColor(const char* shaderVariable, float r, float g, float
 	int variableLocation = glGetUniformLocation(m_shader->ID, shaderVariable);
 	glUseProgram(m_shader->ID);
 	glUniform4f(variableLocation, r, g, b, alpha);
-}
+}*/
 
 int GameObject::addTexture(std::string path, bool isTransparent)
 {
@@ -131,6 +165,38 @@ int GameObject::addTexture(std::string path, bool isTransparent)
 
 	int index = m_textures.size();
 	m_shader->setInt("texture" + std::to_string(index + 1), index);
+}
+
+unsigned int loadCubemap(std::vector<std::string> faces)
+{
+	unsigned int textureID;
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+	int width, height, nrChannels;
+	for (unsigned int i = 0; i < faces.size(); i++)
+	{
+		unsigned char *data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
+		if (data)
+		{
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+				0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
+			);
+			stbi_image_free(data);
+		}
+		else
+		{
+			std::cout << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
+			stbi_image_free(data);
+		}
+	}
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	return textureID;
 }
 
 GameObject::~GameObject()

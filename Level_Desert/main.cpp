@@ -52,7 +52,7 @@ int main()
 // render loop
 int mainLoop()
 {
-	GameObjects.push_back(createPlane());
+	GameObjects.push_back(createPlaneDisk());
 
 	while (!glfwWindowShouldClose(window))
 	{

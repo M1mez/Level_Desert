@@ -7,15 +7,23 @@
 class GameObject
 {
 public:
-	explicit GameObject(arrayObj<float> verticesObj, arrayObj<unsigned int> indicesObj, glm::vec3 position, Shader *shader);
+	explicit GameObject(Shader *shader, arrayObj<float> verticesObj, arrayObj<unsigned int> indicesObj);
+	explicit GameObject(Shader *shader, arrayObj<float> verticesObj);
+	explicit GameObject(Shader *shader);
 
 	glm::vec3 m_position;
 
 	void Draw();
 	void setMat4(const std::string &name, const glm::mat4 &mat) const;
-	void changePos(const char* shaderVariable, float x, float y, float z, float w = 1.0f) const;
-	void changeColor(const char* shaderVariable, float r, float g, float b, float alpha = 1.0f) const;
+
+	void setVertices(arrayObj<float> v);
+	void setIndices(arrayObj<unsigned int> t);
+	void setColorPerV(arrayObj<float> c);
+	void setTexturePerV(arrayObj<float> t);
+
 	int addTexture(std::string path, bool isTransparent);
+	unsigned int loadCubemap(std::vector<std::string> faces);
+
 	~GameObject();
 
 private:
@@ -23,7 +31,9 @@ private:
 	int loadTextures();
 
 	arrayObj<float> m_vertices;
-	arrayObj<unsigned int> m_indices;
+	arrayObj<unsigned int> m_indices; 
+	bool m_indicesSet;
+
 	unsigned int m_VBO;
 	unsigned int m_EBO;
 	unsigned int m_VAO;
