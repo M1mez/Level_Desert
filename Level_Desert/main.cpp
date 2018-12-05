@@ -4,12 +4,16 @@
 
 #include "configVariables.h"
 #include "forwardDeclaration.h"
-#include "enums.h"
 #include <vector>
 #include <algorithm>
 #include "Camera.h"
 
+
+// window / monitor
 GLFWwindow* window;
+GLFWmonitor* primaryMonitor;
+const GLFWvidmode* primaryMode;
+bool fullScreen = false;
 
 // camera
 Camera camera(glm::vec3(0.0f, 0.0f, 0.0f));
@@ -29,6 +33,7 @@ int initializeGL();
 int mainLoop();
 void processInput(GLFWwindow *window);
 void cleanUp();
+void monitorWork();
 
 // shaders
 void initializeShaderMap();
@@ -159,16 +164,21 @@ int initializeGL()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
+	
+
 	// glfw window creation
-	window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
+	//window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
+	monitorWork();
+
 	if (window == NULL)
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
 		glfwTerminate();
 		return -1;
 	}
-	glfwMakeContextCurrent(window);
 
+	glfwMakeContextCurrent(window);
+	   
 	// glad: load all OpenGL function pointers
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
@@ -176,7 +186,7 @@ int initializeGL()
 		return -1;
 	}
 
-	glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
+	glViewport(0, 0, primaryMode->width, primaryMode->height);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 	glfwSetCursorPosCallback(window, mouse_callback);
 	glfwSetScrollCallback(window, scroll_callback);
@@ -186,7 +196,22 @@ int initializeGL()
 	return 0;
 }
 
+void monitorWork()
+{
+	primaryMonitor = glfwGetPrimaryMonitor();
+	primaryMode = glfwGetVideoMode(primaryMonitor);
+	int count;
+	GLFWmonitor** monitors = glfwGetMonitors(&count);
 
+	std::cout << glfwGetMonitorName(primaryMonitor) << " " << &primaryMonitor << std::endl;
+	for (int i = 0; i < count; i++) std::cout << glfwGetMonitorName(monitors[i]) << " " + std::to_string(i) << " " << &monitors[i] << std::endl;
+
+	glfwWindowHint(GLFW_RED_BITS, primaryMode->redBits);
+	glfwWindowHint(GLFW_GREEN_BITS, primaryMode->greenBits);
+	glfwWindowHint(GLFW_BLUE_BITS, primaryMode->blueBits);
+	glfwWindowHint(GLFW_REFRESH_RATE, primaryMode->refreshRate);
+	window = glfwCreateWindow(primaryMode->width, primaryMode->height, "Level Desert", primaryMonitor, NULL);
+}
 
 void cleanUp()
 {

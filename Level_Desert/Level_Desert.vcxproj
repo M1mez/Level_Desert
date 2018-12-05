@@ -70,20 +70,20 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>O:\FH\Sem5\CGES\IncludesLibs\Includes;$(IncludePath)</IncludePath>
-    <LibraryPath>O:\FH\Sem5\CGES\IncludesLibs\Libs;$(LibraryPath)</LibraryPath>
+    <IncludePath>O:\FH\Sem5\CGES\Level_Desert\IncludesLibs\Includes;$(IncludePath)</IncludePath>
+    <LibraryPath>O:\FH\Sem5\CGES\Level_Desert\IncludesLibs\Libs;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>O:\FH\Sem5\CGES\IncludesLibs\Includes;$(IncludePath)</IncludePath>
-    <LibraryPath>O:\FH\Sem5\CGES\IncludesLibs\Libs;$(LibraryPath)</LibraryPath>
+    <IncludePath>O:\FH\Sem5\CGES\Level_Desert\IncludesLibs\Includes;$(IncludePath)</IncludePath>
+    <LibraryPath>O:\FH\Sem5\CGES\Level_Desert\IncludesLibs\Libs;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>O:\FH\Sem5\CGES\IncludesLibs\Includes;$(IncludePath)</IncludePath>
-    <LibraryPath>O:\FH\Sem5\CGES\IncludesLibs\Libs;$(LibraryPath)</LibraryPath>
+    <IncludePath>O:\FH\Sem5\CGES\Level_Desert\IncludesLibs\Includes;$(IncludePath)</IncludePath>
+    <LibraryPath>O:\FH\Sem5\CGES\Level_Desert\IncludesLibs\Libs;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>O:\FH\Sem5\CGES\IncludesLibs\Includes;$(IncludePath)</IncludePath>
-    <LibraryPath>O:\FH\Sem5\CGES\IncludesLibs\Libs;$(LibraryPath)</LibraryPath>
+    <IncludePath>O:\FH\Sem5\CGES\Level_Desert\IncludesLibs\Includes;$(IncludePath)</IncludePath>
+    <LibraryPath>O:\FH\Sem5\CGES\Level_Desert\IncludesLibs\Libs;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -92,9 +92,11 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -104,9 +106,11 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -118,11 +122,13 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -134,16 +140,18 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>glfw3.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="configVariables.cpp" />
-    <ClCompile Include="enums.h" />
+    <ClCompile Include="typeDeclaration.h" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="gameObjectCreation.cpp" />
     <ClCompile Include="glad.c" />
@@ -156,8 +164,10 @@
     <ClInclude Include="configVariables.h" />
     <ClInclude Include="forwardDeclaration.h" />
     <ClInclude Include="GameObject.h" />
+    <ClInclude Include="Mesh.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="stb_image.h" />
+    <ClInclude Include="TextureLoading.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaderFiles\FRAGMENT_CAMERA.fs" />

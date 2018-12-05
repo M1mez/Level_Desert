@@ -2,6 +2,8 @@
 #include "forwardDeclaration.h"
 #include <glm/detail/type_vec3.hpp>
 #include <ctime>
+#include "TextureLoading.h"
+#include "typeDeclaration.h"
 
 
 GameObject* createSimpleTriangleFixedMidScreen(void)
@@ -109,8 +111,8 @@ GameObject *createCubeInSpace(void)
 
 	GameObject *obj = new GameObject(shader, verticesObj, indicesObj);
 
-	obj->addTexture("textures/container.jpg", false);
-	obj->addTexture("textures/awesomeface.png", true);
+	obj->addTexture(storeTexture("textures/container.jpg", false, shader, 0));
+	obj->addTexture(storeTexture("textures/awesomeface.png", true, shader, 1));
 
 	return obj;
 }
@@ -140,7 +142,7 @@ GameObject* createPlaneSquare(void)
 
 	GameObject *obj = new GameObject(shader, verticesObj, indicesObj);
 
-	obj->addTexture("textures/desertfloor1.jpg", false);
+	obj->addTexture(storeTexture("textures/desertfloor1.jpg", false, shader, 0));
 
 	return obj;
 }
@@ -149,45 +151,66 @@ GameObject *createPlaneDisk(void)
 {
 	std::vector<float> vv;
 	float radius = 5.0f;
+	int triangles = 50;
 
-	srand(time(0));
-	int randomval = rand() % 2;
+	const float triangleFraction = static_cast<float>(360) / triangles;
+	float continuousFloat = 0.0f;
 
 	for (int i = 0; i < 360; i++)
 	{
-		const float f(i);
-		const int i2 = i + 1;
-		const float f2(i2);
+		continuousFloat += triangleFraction;
+		i = static_cast<int>(continuousFloat);
 
-		vv.push_back(glm::cos(glm::radians(f)) * radius);
+		const int i2 = i + static_cast<int>(triangleFraction);
+		const float f2 = continuousFloat + triangleFraction;
+
+		vv.push_back(glm::cos(glm::radians(continuousFloat)) * radius);
 		vv.push_back(0.0f);
-		vv.push_back(glm::sin(glm::radians(f)) * radius);
-		vv.push_back(i2 % 2 ? 0.0f : 1.0f);
-		vv.push_back(i2 % 2 ? 0.0f : 1.0f);
+		vv.push_back(glm::sin(glm::radians(continuousFloat)) * radius);
+		
+		/*vv.push_back(i2 % 2 ? 0.0f : 1.0f);
+		vv.push_back(i2 % 2 ? 0.0f : 1.0f);*/
 
 		vv.push_back(glm::cos(glm::radians(f2)) * radius);
 		vv.push_back(0.0f);
 		vv.push_back(glm::sin(glm::radians(f2)) * radius);
-		vv.push_back(i2 % 2 ? 1.0f : 0.0f);
-		vv.push_back(i2 % 2 ? 0.0f : 1.0f);
+		
+		/*vv.push_back(i2 % 2 ? 1.0f : 0.0f);
+		vv.push_back(i2 % 2 ? 0.0f : 1.0f);*/
 
 		vv.push_back(0.0f);
 		vv.push_back(0.0f);
 		vv.push_back(0.0f);
-		vv.push_back(i2 % 2 ? 1.0f : 0.0f);
-		vv.push_back(i2 % 2 ? 1.0f : 0.0f);
+	
+		/*vv.push_back(i2 % 2 ? 1.0f : 0.0f);
+		vv.push_back(i2 % 2 ? 1.0f : 0.0f);*/
 	}
 
-	unsigned int indices[] = { 0 };
-	glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
+	float textureCoords[] = {
+		    0.0f,  0.0f, 
+			1.0f,  0.0f, 
+			1.0f,  1.0f, 
+			1.0f,  1.0f, 
+		    0.0f,  1.0f, 
+		    0.0f,  0.0f,
+			
+			0.0f,  0.0f,
+			1.0f,  0.0f,
+			1.0f,  1.0f,
+			1.0f,  1.0f,
+			0.0f,  1.0f,
+			0.0f,  0.0f
+	};
 
 	const struct arrayObj<float> verticesObj = { vv.size() * sizeof(float), (&vv[0]) };
-	const struct arrayObj<unsigned int> indicesObj = { 0, indices };
+	const struct arrayObj<float> textureObj = { sizeof textureCoords, textureCoords };
 	Shader *shader = getShader(VERTEX_CAMERA, FRAGMENT_CAMERA);
 
-	GameObject *obj = new GameObject(shader, verticesObj, indicesObj);
+	GameObject *obj = new GameObject(shader, verticesObj);
 
-	obj->addTexture("textures/desertfloor1.jpg", false);
+	obj->addTexture(storeTexture("textures/desertfloor1.jpg", false, shader));
+
+	//obj->setTextureCoords(textureObj);
 
 	return obj;
 }

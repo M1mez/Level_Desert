@@ -36,9 +36,6 @@
     <ClCompile Include="gameObjectCreation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="enums.h">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="shaderVariants.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -47,6 +44,9 @@
     </ClCompile>
     <ClCompile Include="stb_image.cpp">
       <Filter>external_files</Filter>
+    </ClCompile>
+    <ClCompile Include="typeDeclaration.h">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -67,6 +67,12 @@
     </ClInclude>
     <ClInclude Include="Camera.h">
       <Filter>external_files</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureLoading.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
