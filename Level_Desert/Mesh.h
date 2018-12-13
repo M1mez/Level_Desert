@@ -1,5 +1,6 @@
 #ifndef MESH_H
 #define MESH_H
+///great class from learnopengl.com, changed to fit my needs
 
 #include <glad/glad.h> // holds all OpenGL type declarations
 
@@ -22,6 +23,29 @@ public:
 	std::vector<unsigned int> indices;
 	std::vector<Texture> textures;
 	unsigned int VAO;
+
+	// to prevent the need of keeping track of the shader manually, save pointer to it directly in the mesh
+	Shader *shader;
+	void setShader(Shader *s)
+	{
+		shader = s;
+	}
+	void setMat4(const char* name, glm::mat4 mat)
+	{
+		if (shader == nullptr) return;
+		shader->setMat4(name, mat);
+	}
+
+
+	void Draw()
+	{
+		if (shader == nullptr)
+		{
+			std::cout << "ERROR::MESH::DRAW::SHADER_NOT_SET" << std::endl;
+			return;
+		}
+		Draw(*shader);
+	}
 
 	/*  Functions  */
 	// constructor
@@ -96,6 +120,7 @@ private:
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
+
 
 		// set the vertex attribute pointers
 		// vertex Positions

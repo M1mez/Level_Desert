@@ -44,3 +44,7 @@ ipch
 .vs/
 *.sln*
 *.tmp
+
+
+#Level Desert stuff
+Level_Desert/models/stones/

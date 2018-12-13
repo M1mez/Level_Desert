@@ -150,32 +150,35 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="configVariables.cpp" />
     <ClCompile Include="typeDeclaration.h" />
-    <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="gameObjectCreation.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="shaderVariants.cpp" />
+    <ClCompile Include="fileLocationMap.cpp" />
     <ClCompile Include="stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
-    <ClInclude Include="configVariables.h" />
     <ClInclude Include="forwardDeclaration.h" />
-    <ClInclude Include="GameObject.h" />
+    <ClInclude Include="helperFunctions.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="model.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="TextureLoading.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaderFiles\FRAGMENT_CAMERA.fs" />
-    <None Include="shaderFiles\FRAGMENT_SIMPLE_1.fs" />
-    <None Include="shaderFiles\FRAGMENT_SIMPLE_TEXTURE.fs" />
+    <None Include="shaderFiles\FRAGMENT_PERM_MODEL.fs" />
+    <None Include="shaderFiles\FRAGMENT_SKYBOX.fs" />
+    <None Include="shaderFiles\FRAGMENT_SKYBOX_CUBEMAP.fs" />
+    <None Include="shaderFiles\FRAGMENT_WALL_REFRACTION.fs" />
     <None Include="shaderFiles\VERTEX_CAMERA.vs" />
-    <None Include="shaderFiles\VERTEX_SIMPLE.vs" />
+    <None Include="shaderFiles\VERTEX_PERM_MODEL.vs" />
     <None Include="shaderFiles\VERTEX_SIMPLE_TEXTURE.vs" />
+    <None Include="shaderFiles\VERTEX_SKYBOX.vs" />
+    <None Include="shaderFiles\VERTEX_SKYBOX_CUBEMAP.vs" />
+    <None Include="shaderFiles\VERTEX_WALL_REFRACTION.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

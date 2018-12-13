@@ -4,218 +4,321 @@
 #include <ctime>
 #include "TextureLoading.h"
 #include "typeDeclaration.h"
+#include "Mesh.h"
+#include "model.h"
+#include "helperFunctions.h"
+#include <iomanip>
 
+class Camera;
+// files
+extern float planeRadius;
+float glassCylinderHeight = 20.0f;
 
-GameObject* createSimpleTriangleFixedMidScreen(void)
+float minObjDistance = 3.5f;
+
+extern Camera camera;
+
+unsigned int glassVAO, glassVBO;
+Shader *glassShader;
+unsigned int skyboxVAO, skyboxVBO;
+Shader *skyBoxShader;
+unsigned int skyboxTexture;
+
+extern Mesh *disk;
+extern Mesh *glass;
+const int floorTriangles = 50;
+const int glassTriangles = 36;
+
+#pragma region drawing
+// create glass elements at the borders
+void drawGlass(glm::mat4 &model, glm::mat4 &projection, glm::mat4 &view, glm::vec3 cameraPos)
 {
-	float vertices[] = {
-		// positions         // colors
-		 0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   // bottom right
-		-0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,   // bottom left
-		 0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f    // top 
-	};
-	unsigned int indices[] = {  // note that we start from 0!
-		0   // first triangle
-	};
-
-	glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
-
-	const struct arrayObj<float> verticesObj = { sizeof vertices, vertices };
-	const struct arrayObj<unsigned int> indicesObj = { 0, indices };
-	Shader *shader = getShader(VERTEX_SIMPLE, FRAGMENT_SIMPLE_1);
-	GameObject *obj = new GameObject(shader, verticesObj, indicesObj);
-
-	return obj;
+	glassShader->use();
+	glassShader->setMat4("model", model);
+	glassShader->setMat4("view", view);
+	glassShader->setMat4("projection", projection);
+	glassShader->setVec3("cameraPos", cameraPos);
+	glBindVertexArray(glassVAO);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
+	glDrawArrays(GL_TRIANGLES, 0, glassTriangles * 3);
+	glBindVertexArray(0);
 }
-
-GameObject* createSimpleRectangleFixedMidScreen(void)
+// draw skybox as last object
+void drawSkyBox(glm::mat4 &model, glm::mat4 &projection, glm::mat4 newView)
 {
-	float vertices[] = {
-		// positions          // colors           // texture coords
-		 0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
-		 0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
-		-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
-		-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
-	};
-
-	unsigned int indices[] = {  // note that we start from 0!
-		0, 1, 3,   // first triangle
-		1, 2, 3    // second triangle
-	};
-
-	glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
-
-	const struct arrayObj<float> verticesObj = { sizeof vertices, vertices };
-	const struct arrayObj<unsigned int> indicesObj = { sizeof indices, indices };
-	Shader *shader = getShader(VERTEX_SIMPLE_TEXTURE, FRAGMENT_SIMPLE_TEXTURE);
-	GameObject *obj = new GameObject(shader, verticesObj, indicesObj);
-
-	return obj;
+	glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
+	skyBoxShader->use();
+	skyBoxShader->setMat4("view", newView);
+	skyBoxShader->setMat4("projection", projection);
+	glBindVertexArray(skyboxVAO);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+	glBindVertexArray(0);
+	glDepthFunc(GL_LESS);
 }
+#pragma endregion
 
-GameObject *createCubeInSpace(void)
+#pragma region creation
+// no model can be closer to another model than minDist
+void createLocations(int amount, std::vector <glm::vec2> &locationList, float minDist)
 {
-	// set up vertex data (and buffer(s)) and configure vertex attributes
-   // ------------------------------------------------------------------
-	float vertices[] = {
-		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-		 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-
-		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-	};
-
-	unsigned int indices[] = { 0 };
-
-	glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
-
-	const struct arrayObj<float> verticesObj = { sizeof vertices, vertices };
-	const struct arrayObj<unsigned int> indicesObj = { 0, indices };
-	Shader *shader = getShader(VERTEX_CAMERA, FRAGMENT_CAMERA);
-
-	GameObject *obj = new GameObject(shader, verticesObj, indicesObj);
-
-	obj->addTexture(storeTexture("textures/container.jpg", false, shader, 0));
-	obj->addTexture(storeTexture("textures/awesomeface.png", true, shader, 1));
-
-	return obj;
-}
-
-GameObject* createPlaneSquare(void)
-{
-	float vertices[] = {
-		   -1.0f,  0.0f, -1.0f,  0.0f, 0.0f,
-			1.0f,  0.0f, -1.0f,  1.0f, 0.0f,
-			1.0f,  0.0f, 1.0f,  1.0f, 1.0f,
-			1.0f,  0.0f, 1.0f,  1.0f, 1.0f,
-		   -1.0f,  0.0f, 1.0f,  0.0f, 1.0f,
-		   -1.0f,  0.0f, -1.0f,  0.0f, 0.0f
-	};
-
-	for (unsigned int i = 0; i < sizeof(vertices) / sizeof(float); i++)
+	Shader *shader = getShader(VERTEX_PERM_MODEL, FRAGMENT_PERM_MODEL);
+	for (int i = 0; i < amount; i++)
 	{
-		vertices[i] *= 5;
+		glm::vec2 newLoc;
+		if (getValidVec2InBounds(locationList, &newLoc, minDist) < 0) return;
+		locationList.push_back(newLoc);
 	}
-
-	unsigned int indices[] = { 0 };
-	glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
-
-	const struct arrayObj<float> verticesObj = { sizeof vertices, vertices };
-	const struct arrayObj<unsigned int> indicesObj = { 0, indices };
-	Shader *shader = getShader(VERTEX_CAMERA, FRAGMENT_CAMERA);
-
-	GameObject *obj = new GameObject(shader, verticesObj, indicesObj);
-
-	obj->addTexture(storeTexture("textures/desertfloor1.jpg", false, shader, 0));
-
-	return obj;
 }
-
-GameObject *createPlaneDisk(void)
+// create plane circle as floor
+Mesh *createPlaneDisk(void)
 {
-	std::vector<float> vv;
-	float radius = 5.0f;
-	int triangles = 50;
+	std::vector<Vertex> vv;
 
-	const float triangleFraction = static_cast<float>(360) / triangles;
+	const float triangleFraction = static_cast<float>(360) / floorTriangles;
 	float continuousFloat = 0.0f;
 
-	for (int i = 0; i < 360; i++)
+	for (int i = 0; i < 360;)
 	{
 		continuousFloat += triangleFraction;
 		i = static_cast<int>(continuousFloat);
 
-		const int i2 = i + static_cast<int>(triangleFraction);
-		const float f2 = continuousFloat + triangleFraction;
+		const float rad1 = glm::radians(continuousFloat);
+		const float rad2 = glm::radians(continuousFloat + triangleFraction);
 
-		vv.push_back(glm::cos(glm::radians(continuousFloat)) * radius);
-		vv.push_back(0.0f);
-		vv.push_back(glm::sin(glm::radians(continuousFloat)) * radius);
-		
-		/*vv.push_back(i2 % 2 ? 0.0f : 1.0f);
-		vv.push_back(i2 % 2 ? 0.0f : 1.0f);*/
+		Vertex v1;
+		v1.Position = glm::vec3(
+			glm::cos(rad1) * planeRadius,
+			0.0f,
+			glm::sin(rad1) * planeRadius);
+		v1.TexCoords = glm::vec2(
+			(1 + v1.Position.x) * 4 / planeRadius,
+			(1 + v1.Position.z) * 4 / planeRadius
+		);
+		vv.push_back(v1);
 
-		vv.push_back(glm::cos(glm::radians(f2)) * radius);
-		vv.push_back(0.0f);
-		vv.push_back(glm::sin(glm::radians(f2)) * radius);
-		
-		/*vv.push_back(i2 % 2 ? 1.0f : 0.0f);
-		vv.push_back(i2 % 2 ? 0.0f : 1.0f);*/
+		Vertex v2;
+		v2.Position = glm::vec3(
+			glm::cos(rad2) * planeRadius,
+			0.0f,
+			glm::sin(rad2) * planeRadius);
+		v2.TexCoords = glm::vec2(
+			(1 + v2.Position.x) * 4 / planeRadius,
+			(1 + v2.Position.z) * 4 / planeRadius
+		);
+		vv.push_back(v2);
 
-		vv.push_back(0.0f);
-		vv.push_back(0.0f);
-		vv.push_back(0.0f);
-	
-		/*vv.push_back(i2 % 2 ? 1.0f : 0.0f);
-		vv.push_back(i2 % 2 ? 1.0f : 0.0f);*/
+		Vertex v3;
+		v3.Position = glm::vec3(0.0f, 0.0f, 0.0f);
+		v3.TexCoords = glm::vec2(0.5f, 0.5f);
+		vv.push_back(v3);
+	}
+	std::vector<unsigned int> indices;
+	unsigned int fi = 0;
+	for (unsigned int i = 0; i < vv.size(); i++)
+	{
+		for (unsigned int ri = 0; ri < 3; ri++)
+			indices.push_back(ri + i);
 	}
 
-	float textureCoords[] = {
-		    0.0f,  0.0f, 
-			1.0f,  0.0f, 
-			1.0f,  1.0f, 
-			1.0f,  1.0f, 
-		    0.0f,  1.0f, 
-		    0.0f,  0.0f,
-			
-			0.0f,  0.0f,
-			1.0f,  0.0f,
-			1.0f,  1.0f,
-			1.0f,  1.0f,
-			0.0f,  1.0f,
-			0.0f,  0.0f
-	};
+	//Shader *shader = getShader(VERTEX_CAMERA, FRAGMENT_CAMERA);
+	Shader *shader = getShader(VERTEX_PERM_MODEL, FRAGMENT_PERM_MODEL);
 
-	const struct arrayObj<float> verticesObj = { vv.size() * sizeof(float), (&vv[0]) };
-	const struct arrayObj<float> textureObj = { sizeof textureCoords, textureCoords };
-	Shader *shader = getShader(VERTEX_CAMERA, FRAGMENT_CAMERA);
+	Texture t;
+	t.path = "models/desertfloor/desertfloornormal.png";
+	t.id = storeTexture(t.path, false, shader);
+	t.type = "texture_diffuse1";
+	std::vector<Texture> tv;
+	tv.push_back(t);
 
-	GameObject *obj = new GameObject(shader, verticesObj);
-
-	obj->addTexture(storeTexture("textures/desertfloor1.jpg", false, shader));
-
-	//obj->setTextureCoords(textureObj);
-
-	return obj;
+	Mesh *m = new Mesh(vv, indices, tv);
+	m->setShader(shader);
+	return m;
 }
-
-GameObject *createSkyBox(void)
+/*
+unsigned int 
+Mesh **createCameraLenses()
 {
+	float* lenses[3];
+	int count = 0;
+
+
+	Shader *shader = getShader(VERTEX_PERM_MODEL, FRAGMENT_PERM_MODEL);
+
+	for (int i = 0; i < 3; i++)
+	{
+		float vertices[6 * 3];
+		addVertexWithNormals(-1.0f, 1.0f, 0.0f, vertices, count);
+		addVertexWithNormals(1.0f, 1.0f, 0.0f, vertices, count);
+		addVertexWithNormals(-1.0f, 1.0f, 1.0f, vertices, count);
+
+		addVertexWithNormals(1.0f, 1.0f, 0.0f, vertices, count);
+		addVertexWithNormals(-1.0f, 1.0f, 1.0f, vertices, count);
+		addVertexWithNormals(11.0f, 1.0f, 1.0f, vertices, count);
+
+		Texture t;
+		t.path = "models/desertfloor/desertfloornormal.png";
+		t.id = storeTexture(t.path, false, shader);
+		t.type = "texture_diffuse1";
+		std::vector<Texture> tv;
+		tv.push_back(t);
+
+		Mesh *m = new Mesh(vv, indices, tv);
+		m->setShader(shader);
+
+	}
+	return lenses;
+}*/
+// create glass walls at border
+Mesh *createGlass(void)
+{
+	float vertices[glassTriangles * 18];
+
+	const float triangleFraction = static_cast<float>(360) / glassTriangles;
+	float continuousFloat = 0.0f;
+	bool firstHalf = false;
+	float rad = glm::radians(triangleFraction);
+	int count = 0;
+	for (int i = 0; i < 360;)
+	{
+		continuousFloat += triangleFraction;
+		i = static_cast<int>(continuousFloat);
+
+		float xPos1 = glm::cos(rad) * planeRadius;
+		float zPos1 = glm::sin(rad) * planeRadius;
+		rad = glm::radians(continuousFloat + triangleFraction);
+		float xPos2 = glm::cos(rad) * planeRadius;
+		float zPos2 = glm::sin(rad) * planeRadius;
+
+		addVertexWithNormals(xPos1, zPos1, !firstHalf ? glassCylinderHeight : 0.0f, vertices, count);
+		addVertexWithNormals(xPos1, zPos1, firstHalf ? glassCylinderHeight : 0.0f, vertices, count);
+		addVertexWithNormals(xPos2, zPos2, !firstHalf ? glassCylinderHeight : 0.0f, vertices, count);
+	}
+
+	glassShader = getShader(VERTEX_WALL_REFRACTION, FRAGMENT_WALL_REFRACTION);
+
+	glGenVertexArrays(1, &glassVAO);
+	glGenBuffers(1, &glassVBO);
+	glBindVertexArray(glassVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, glassVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices[0], GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+
 	return nullptr;
 }
+// create 3 cactus-LOD models in parameter vector
+void createCactus(std::vector<Model*> &vector)
+{
+	Shader *shader;
+	Model *newM;;
+
+	shader = getShader(VERTEX_PERM_MODEL, FRAGMENT_PERM_MODEL);
+	newM = new Model(getModelLoc(MODEL_CACTUS_1_LOD0), shader);
+	newM->setScale(10.0f);
+	//newM->setRotation(glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(-90.0f, 0.0f, 0.0f));
+	newM->setRotation(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+	newM->prioAxis = 1;
+	vector.push_back(newM);
+
+	shader = getShader(VERTEX_PERM_MODEL, FRAGMENT_PERM_MODEL);
+	newM = new Model(getModelLoc(MODEL_CACTUS_1_LOD1), shader);
+	newM->setScale(10.0f);
+	newM->setRotation(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+	newM->prioAxis = 1;
+	vector.push_back(newM);
+
+	shader = getShader(VERTEX_PERM_MODEL, FRAGMENT_PERM_MODEL);
+	newM = new Model(getModelLoc(MODEL_CACTUS_1_LOD2), shader);
+	newM->setScale(10.0f);
+	newM->setRotation(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+	newM->prioAxis = 1;
+	vector.push_back(newM);
+}
+// to test model-loading
+Model *createNanoSuit(void)
+{
+	Shader *shader = getShader(VERTEX_PERM_MODEL, FRAGMENT_PERM_MODEL);
+	return new Model(getModelLoc(MODEL_NANOSUIT), shader);
+}
+// create skybox with textured faces
+void createSkyBox(void)
+{
+	float skyboxVertices[] = {
+		-1.0f,  1.0f, -1.0f,
+		-1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		-1.0f,  1.0f, -1.0f,
+		 1.0f,  1.0f, -1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		 1.0f, -1.0f,  1.0f
+	};
+	std::vector<std::string> faces {
+		"skyboxes/tutskybox/right.jpg",
+		"skyboxes/tutskybox/left.jpg",
+		"skyboxes/tutskybox/top.jpg",
+		"skyboxes/tutskybox/bottom.jpg",
+		"skyboxes/tutskybox/front.jpg",
+		"skyboxes/tutskybox/back.jpg"
+	};
+
+	glGenVertexArrays(1, &skyboxVAO);
+	glGenBuffers(1, &skyboxVBO);
+	glBindVertexArray(skyboxVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+	skyboxTexture = loadCubemap(faces);
+	skyBoxShader = getShader(VERTEX_SKYBOX, FRAGMENT_SKYBOX);
+
+	skyBoxShader->use();
+	skyBoxShader->setInt("skybox", 0);
+}
+// skybox, disk and glasswalls don't need further information, so creation is bundled
+void createScenery(void)
+{
+	createSkyBox();
+	disk = createPlaneDisk();
+	glass = createGlass();
+}
+#pragma endregion

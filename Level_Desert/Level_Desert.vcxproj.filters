@@ -19,7 +19,7 @@
     <Filter Include="shaderFiles">
       <UniqueIdentifier>{3ef9f130-3e64-4ec2-a2c3-e99d139727d0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="external_files">
+    <Filter Include="classes mainly from tutorial">
       <UniqueIdentifier>{86305168-77f5-4fdf-a809-42b5f8faf428}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -27,64 +27,49 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="configVariables.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GameObject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="gameObjectCreation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="shaderVariants.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="glad.c">
-      <Filter>external_files</Filter>
+      <Filter>classes mainly from tutorial</Filter>
     </ClCompile>
     <ClCompile Include="stb_image.cpp">
-      <Filter>external_files</Filter>
+      <Filter>classes mainly from tutorial</Filter>
     </ClCompile>
     <ClCompile Include="typeDeclaration.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fileLocationMap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="configVariables.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GameObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="forwardDeclaration.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Shader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="stb_image.h">
-      <Filter>external_files</Filter>
+      <Filter>classes mainly from tutorial</Filter>
     </ClInclude>
     <ClInclude Include="Camera.h">
-      <Filter>external_files</Filter>
+      <Filter>classes mainly from tutorial</Filter>
     </ClInclude>
     <ClInclude Include="TextureLoading.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Mesh.h">
+    <ClInclude Include="helperFunctions.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="model.h">
+      <Filter>classes mainly from tutorial</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>classes mainly from tutorial</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>classes mainly from tutorial</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaderFiles\FRAGMENT_SIMPLE_1.fs">
-      <Filter>shaderFiles</Filter>
-    </None>
-    <None Include="shaderFiles\VERTEX_SIMPLE.vs">
-      <Filter>shaderFiles</Filter>
-    </None>
-    <None Include="shaderFiles\FRAGMENT_SIMPLE_TEXTURE.fs">
-      <Filter>shaderFiles</Filter>
-    </None>
     <None Include="shaderFiles\VERTEX_SIMPLE_TEXTURE.vs">
       <Filter>shaderFiles</Filter>
     </None>
@@ -92,6 +77,30 @@
       <Filter>shaderFiles</Filter>
     </None>
     <None Include="shaderFiles\FRAGMENT_CAMERA.fs">
+      <Filter>shaderFiles</Filter>
+    </None>
+    <None Include="shaderFiles\VERTEX_SKYBOX.vs">
+      <Filter>shaderFiles</Filter>
+    </None>
+    <None Include="shaderFiles\FRAGMENT_SKYBOX.fs">
+      <Filter>shaderFiles</Filter>
+    </None>
+    <None Include="shaderFiles\VERTEX_SKYBOX_CUBEMAP.vs">
+      <Filter>shaderFiles</Filter>
+    </None>
+    <None Include="shaderFiles\FRAGMENT_SKYBOX_CUBEMAP.fs">
+      <Filter>shaderFiles</Filter>
+    </None>
+    <None Include="shaderFiles\FRAGMENT_PERM_MODEL.fs">
+      <Filter>shaderFiles</Filter>
+    </None>
+    <None Include="shaderFiles\VERTEX_PERM_MODEL.vs">
+      <Filter>shaderFiles</Filter>
+    </None>
+    <None Include="shaderFiles\VERTEX_WALL_REFRACTION.vs">
+      <Filter>shaderFiles</Filter>
+    </None>
+    <None Include="shaderFiles\FRAGMENT_WALL_REFRACTION.fs">
       <Filter>shaderFiles</Filter>
     </None>
   </ItemGroup>

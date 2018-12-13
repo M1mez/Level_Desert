@@ -4,11 +4,13 @@
 #include "stb_image.h"
 #include <iostream>
 #include "Shader.h"
+#include "assimp/texture.h"
 
 
 unsigned int loadCubemap(std::vector<std::string> faces);
 unsigned int storeTexture(std::string path, bool isTransparent, Shader *shader, unsigned int index);
 
+//load cubemap textures, skybox e.g. needs that
 inline unsigned int loadCubemap(std::vector<std::string> faces)
 {
 	unsigned int textureID;
@@ -41,6 +43,7 @@ inline unsigned int loadCubemap(std::vector<std::string> faces)
 	return textureID;
 }
 
+//load standard texture
 inline unsigned int storeTexture(std::string path, bool isTransparent, Shader *shader, unsigned int index = 0)
 {
 	shader->use();
@@ -52,14 +55,13 @@ inline unsigned int storeTexture(std::string path, bool isTransparent, Shader *s
 
 	glGenTextures(1, &texId);
 	glBindTexture(GL_TEXTURE_2D, texId);
-	//m_textureIDs.push_back(texId);
-	// set the texture wrapping parameters
+
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	// set texture filtering parameters
+
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	// load image, create texture and generate mipmaps
+
 	int width, height, nrChannels;
 	stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
 	unsigned char *data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
@@ -75,8 +77,6 @@ inline unsigned int storeTexture(std::string path, bool isTransparent, Shader *s
 		return -1;
 	}
 	stbi_image_free(data);
-
-	/*int index = m_textureIDs.size();*/
 	shader->setInt("texture" + std::to_string(index + 1), index);
 
 	return texId;

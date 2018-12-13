@@ -4,16 +4,27 @@
 #include <string>
 
 enum vertexShaderType {
-	VERTEX_NONE, 
-	VERTEX_SIMPLE,
+	VERTEX_NONE,
+	VERTEX_CAMERA,
+	VERTEX_PERM_MODEL,
 	VERTEX_SIMPLE_TEXTURE,
-	VERTEX_CAMERA
+	VERTEX_SKYBOX, 
+	VERTEX_SKYBOX_CUBEMAP,
+	VERTEX_WALL_REFRACTION
 };
 enum fragmentShaderType { 
 	FRAGMENT_NONE, 
-	FRAGMENT_SIMPLE_1, 
-	FRAGMENT_SIMPLE_TEXTURE,
-	FRAGMENT_CAMERA
+	FRAGMENT_CAMERA,
+	FRAGMENT_PERM_MODEL,
+	FRAGMENT_SKYBOX,
+	FRAGMENT_SKYBOX_CUBEMAP,
+	FRAGMENT_WALL_REFRACTION
+};
+enum modelLocationType {
+	MODEL_NANOSUIT,
+	MODEL_CACTUS_1_LOD0,
+	MODEL_CACTUS_1_LOD1,
+	MODEL_CACTUS_1_LOD2,
 };
 
 template <typename T>
@@ -23,15 +34,10 @@ struct arrayObj {
 };
 
 struct Vertex {
-	// position
 	glm::vec3 Position;
-	// normal
 	glm::vec3 Normal;
-	// texCoords
 	glm::vec2 TexCoords;
-	// tangent
 	glm::vec3 Tangent;
-	// bitangent
 	glm::vec3 Bitangent;
 };
 
