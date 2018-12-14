@@ -156,6 +156,8 @@ void cleanUp()
 //keyboard input
 void processInput(GLFWwindow *window)
 {
+
+#pragma region exit
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 	{
 		glfwSetWindowShouldClose(window, true);
@@ -163,10 +165,13 @@ void processInput(GLFWwindow *window)
 	}
 	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	else if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_RELEASE) glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+#pragma endregion
 
 #pragma region movement
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
 		camera.ProcessKeyboard(FORWARD, deltaTime);
+		if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+			camera.ProcessKeyboard(FORWARD, deltaTime);
 		if (playerBound) {
 			if (camera.Position.y < min_altitude) camera.Position.y = min_altitude;
 			else if (camera.Position.y > max_altitude) camera.Position.y = max_altitude;
@@ -174,6 +179,8 @@ void processInput(GLFWwindow *window)
 	}
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
 		camera.ProcessKeyboard(BACKWARD, deltaTime);
+		if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+			camera.ProcessKeyboard(BACKWARD, deltaTime);
 		if (playerBound) {
 			if (camera.Position.y < min_altitude) camera.Position.y = min_altitude;
 			else if (camera.Position.y > max_altitude) camera.Position.y = max_altitude;
@@ -182,10 +189,14 @@ void processInput(GLFWwindow *window)
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 	{
 		camera.ProcessKeyboard(LEFT, deltaTime);
+		if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+			camera.ProcessKeyboard(LEFT, deltaTime);
 	}
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 	{
 		camera.ProcessKeyboard(RIGHT, deltaTime);
+		if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+			camera.ProcessKeyboard(RIGHT, deltaTime);
 	}
 #pragma endregion
 

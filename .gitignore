@@ -42,7 +42,7 @@ Release
 ipch
 *sdf
 .vs/
-*.sln*
+#*.sln*
 *.tmp
 
 
