@@ -11,10 +11,12 @@ void createSkyBox(void);
 Model *createStoneTree(void);
 void createScenery(void);
 void createCactus(std::vector<Model*> &vector);
+void createCameraLenses(void);
 
 // draw
 void drawSkyBox(glm::mat4 &model, glm::mat4 &projection, glm::mat4 newView);
 void drawGlass(glm::mat4 &model, glm::mat4 &projection, glm::mat4 &view, glm::vec3 cameraPos);
+void drawCameraLenses(glm::mat4 &model, glm::mat4 &projection, glm::mat4 &view, glm::vec3 cameraPos);
 
 // Maps
 std::string getModelLoc(modelLocationType model);

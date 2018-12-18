@@ -23,12 +23,14 @@ void initializeShaderMap()
 	vertexShaders[VERTEX_SKYBOX_CUBEMAP] = shaderLocation + "VERTEX_SKYBOX_CUBEMAP.vs";
 	vertexShaders[VERTEX_PERM_MODEL] = shaderLocation + "VERTEX_PERM_MODEL.vs";
 	vertexShaders[VERTEX_WALL_REFRACTION] = shaderLocation + "VERTEX_WALL_REFRACTION.vs";
+	vertexShaders[VERTEX_BLENDING] = shaderLocation + "VERTEX_BLENDING.vs";
 #pragma endregion
 #pragma region fragment
 	fragmentShaders[FRAGMENT_SKYBOX] = shaderLocation + "FRAGMENT_SKYBOX.fs";
 	fragmentShaders[FRAGMENT_SKYBOX_CUBEMAP] = shaderLocation + "FRAGMENT_SKYBOX_CUBEMAP.fs";
 	fragmentShaders[FRAGMENT_PERM_MODEL] = shaderLocation + "FRAGMENT_PERM_MODEL.fs";
 	fragmentShaders[FRAGMENT_WALL_REFRACTION] = shaderLocation + "FRAGMENT_WALL_REFRACTION.fs";
+	fragmentShaders[FRAGMENT_BLENDING] = shaderLocation + "FRAGMENT_BLENDING.fs";
 #pragma endregion
 }
 #pragma endregion

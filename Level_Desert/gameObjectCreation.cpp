@@ -23,6 +23,13 @@ Shader *glassShader;
 unsigned int skyboxVAO, skyboxVBO;
 Shader *skyBoxShader;
 unsigned int skyboxTexture;
+Shader  *lenseShader[3];
+unsigned int lenseVBO[3];
+unsigned int lenseVAO[3];
+unsigned int lenseEBO[3];
+unsigned int lenseColor[3];
+unsigned int lenseTexture;
+glm::vec3 lensePositions[3];
 
 extern Mesh *disk;
 extern Mesh *glass;
@@ -57,6 +64,33 @@ void drawSkyBox(glm::mat4 &model, glm::mat4 &projection, glm::mat4 newView)
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 	glBindVertexArray(0);
 	glDepthFunc(GL_LESS);
+}
+// draw camera lenses
+void drawCameraLenses(glm::mat4 &model, glm::mat4 &projection, glm::mat4 &view, glm::vec3 cameraPos)
+{
+	std::map<float, int> sorted;
+	for (unsigned int i = 0; i < 3; i++) sorted[glm::length(cameraPos - lensePositions[i])] = i;
+	
+	glEnable(GL_BLEND);
+	float lenseDistance = -10.0f;
+
+	for (std::map<float, int>::reverse_iterator it = sorted.rbegin(); it != sorted.rend(); ++it)
+	{
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, lenseTexture);
+
+		model = glm::translate(model, lensePositions[it->second]);
+
+		lenseShader[it->second]->use();
+		lenseShader[it->second]->setMat4("projection", projection);
+		lenseShader[it->second]->setMat4("view", view);
+		lenseShader[it->second]->setMat4("model", model);
+
+		glBindVertexArray(lenseVAO[it->second]);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+		model = glm::translate(model, -lensePositions[it->second]);
+	}
 }
 #pragma endregion
 
@@ -137,40 +171,62 @@ Mesh *createPlaneDisk(void)
 	m->setShader(shader);
 	return m;
 }
-/*
-unsigned int 
-Mesh **createCameraLenses()
+// create 3 windows to showcase transparency
+void createCameraLenses(void)
 {
-	float* lenses[3];
-	int count = 0;
-
-
-	Shader *shader = getShader(VERTEX_PERM_MODEL, FRAGMENT_PERM_MODEL);
 
 	for (int i = 0; i < 3; i++)
 	{
-		float vertices[6 * 3];
-		addVertexWithNormals(-1.0f, 1.0f, 0.0f, vertices, count);
-		addVertexWithNormals(1.0f, 1.0f, 0.0f, vertices, count);
-		addVertexWithNormals(-1.0f, 1.0f, 1.0f, vertices, count);
+		lenseShader[i] = getShader(VERTEX_BLENDING, FRAGMENT_BLENDING);
 
-		addVertexWithNormals(1.0f, 1.0f, 0.0f, vertices, count);
-		addVertexWithNormals(-1.0f, 1.0f, 1.0f, vertices, count);
-		addVertexWithNormals(11.0f, 1.0f, 1.0f, vertices, count);
+		float rgb[3] = { 0.0f };
+		rgb[i] = 1.0f;
+		float size = 6.0f;
+		float posOffset = 8.0f * i;
 
-		Texture t;
-		t.path = "models/desertfloor/desertfloornormal.png";
-		t.id = storeTexture(t.path, false, shader);
-		t.type = "texture_diffuse1";
-		std::vector<Texture> tv;
-		tv.push_back(t);
+		lensePositions[i] = glm::vec3(0.0f, 0.0f, size + posOffset);
 
-		Mesh *m = new Mesh(vv, indices, tv);
-		m->setShader(shader);
+		float vertices[] = {
+			 // positions						// colors						// texture coords
+			 size,  2 * size,	0.0f,			rgb[0], rgb[1], rgb[2],			1.0f, 1.0f,
+			 size,	0.0f,		0.0f,			rgb[0], rgb[1], rgb[2],			1.0f, 0.0f,
+			-size,	0.0f,		0.0f,			rgb[0], rgb[1], rgb[2],			0.0f, 0.0f,
+			-size,  2 * size,	0.0f,			rgb[0], rgb[1], rgb[2],			0.0f, 1.0f
+		};
 
+		unsigned int indices[] = {
+			0, 1, 3, // first triangle
+			1, 2, 3  // second triangle
+		};
+
+		unsigned int VBO, VAO, EBO;
+		glGenVertexArrays(1, &VAO);
+		glGenBuffers(1, &VBO);
+		glGenBuffers(1, &EBO);
+
+		glBindVertexArray(VAO);
+
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+		glEnableVertexAttribArray(2);
+
+		lenseTexture = storeTexture("models/window/cookie.png", false, lenseShader[i]);
+
+
+		lenseVBO[i] = VBO;
+		lenseVAO[i] = VAO;
+		lenseEBO[i] = EBO;
 	}
-	return lenses;
-}*/
+}
 // create glass walls at border
 Mesh *createGlass(void)
 {
@@ -291,7 +347,7 @@ void createSkyBox(void)
 		-1.0f, -1.0f,  1.0f,
 		 1.0f, -1.0f,  1.0f
 	};
-	std::vector<std::string> faces {
+	std::vector<std::string> faces{
 		"skyboxes/tutskybox/right.jpg",
 		"skyboxes/tutskybox/left.jpg",
 		"skyboxes/tutskybox/top.jpg",
@@ -320,5 +376,6 @@ void createScenery(void)
 	createSkyBox();
 	disk = createPlaneDisk();
 	glass = createGlass();
+	createCameraLenses();
 }
 #pragma endregion

@@ -65,6 +65,8 @@ int main()
 
 	initializeMaps();
 
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	if (mainLoop() < 0) return -1;
 
 
@@ -104,9 +106,8 @@ int mainLoop()
 		view = camera.GetViewMatrix();
 
 		//set plane.y so that camera is above plane
-		float planeOffsetY = -0.1f;
+		float planeOffsetY = -2.5f;
 		model = glm::translate(model, glm::vec3(0.0f, planeOffsetY, 0.0f));
-
 
 #pragma region plane
 		disk->shader->use();
@@ -129,6 +130,9 @@ int mainLoop()
 #pragma region glass wall
 		drawGlass(model, projection, view, camera.Position);
 #pragma endregion
+
+		drawCameraLenses(model, projection, view, camera.Position);
+
 
 		//reset plane.y
 		model = glm::translate(model, glm::vec3(0.0f, -planeOffsetY, 0.0f));
