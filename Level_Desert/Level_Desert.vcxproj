@@ -180,11 +180,13 @@
     <ClInclude Include="TextureLoading.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shaderFiles\FRAGMENT_BLENDING.fs" />
     <None Include="shaderFiles\FRAGMENT_CAMERA.fs" />
     <None Include="shaderFiles\FRAGMENT_PERM_MODEL.fs" />
     <None Include="shaderFiles\FRAGMENT_SKYBOX.fs" />
     <None Include="shaderFiles\FRAGMENT_SKYBOX_CUBEMAP.fs" />
     <None Include="shaderFiles\FRAGMENT_WALL_REFRACTION.fs" />
+    <None Include="shaderFiles\VERTEX_BLENDING.vs" />
     <None Include="shaderFiles\VERTEX_CAMERA.vs" />
     <None Include="shaderFiles\VERTEX_PERM_MODEL.vs" />
     <None Include="shaderFiles\VERTEX_SIMPLE_TEXTURE.vs" />

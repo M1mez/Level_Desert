@@ -68,6 +68,7 @@ inline unsigned int storeTexture(std::string path, bool isTransparent, Shader *s
 	if (data)
 	{
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, transparency, GL_UNSIGNED_BYTE, data);
+		glEnable(GL_TEXTURE_2D);
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	else

@@ -103,5 +103,11 @@
     <None Include="shaderFiles\FRAGMENT_WALL_REFRACTION.fs">
       <Filter>shaderFiles</Filter>
     </None>
+    <None Include="shaderFiles\FRAGMENT_BLENDING.fs">
+      <Filter>shaderFiles</Filter>
+    </None>
+    <None Include="shaderFiles\VERTEX_BLENDING.vs">
+      <Filter>shaderFiles</Filter>
+    </None>
   </ItemGroup>
 </Project>

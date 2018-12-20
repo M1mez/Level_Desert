@@ -161,9 +161,9 @@ Mesh *createPlaneDisk(void)
 	Shader *shader = getShader(VERTEX_PERM_MODEL, FRAGMENT_PERM_MODEL);
 
 	Texture t;
-	t.path = "models/desertfloor/desertfloornormal.png";
+	t.path = "models/desertfloor/desertfloorsmall.png";
 	t.id = storeTexture(t.path, false, shader);
-	t.type = "texture_diffuse1";
+	t.type = "texture_diffuse";
 	std::vector<Texture> tv;
 	tv.push_back(t);
 
